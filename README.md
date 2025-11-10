@@ -1,76 +1,60 @@
-# Queue_CTL_CLI
-#🚀 queuectl: A Command-Line Job Queue Manager
-A lightweight, persistent, and resilient background job queue system for your shell commands, powered by Node.js, BullMQ, and Redis.
+queuectl: A CLI Job Queue System
+queuectl is a command-line interface for managing a persistent, background job queue. It's built on Node.js and powered by BullMQ and Redis.
 
-queuectl lets you enqueue standard shell commands as background jobs. The system is designed for resilience, featuring automatic retries with exponential backoff and a Dead Letter Queue (DLQ) for jobs that repeatedly fail.
+It allows you to enqueue shell commands as background jobs, which are then processed by a pool of workers. It's designed to be resilient, supporting automatic retries with exponential backoff and a Dead Letter Queue (DLQ) for jobs that permanently fail.
 
-(Pro-tip: Consider adding a demo GIF here!) ``
+Features
+Persistent Queues: Jobs are stored in Redis and survive application or server restarts.
+Worker Pooling: Run multiple worker processes to handle jobs in parallel.
+Automatic Retries: Failed jobs are automatically retried with exponential backoff.
+Dead Letter Queue (DLQ): Jobs that exhaust all retries are moved to a DLQ for inspection.
+Full CLI Control: Enqueue, start/stop workers, check status, and manage the DLQ from your terminal.
+Prerequisites
+Before you can run queuectl, you must have the following dependencies installed on your system.
 
-#✨ Key Features
-#💾 Persistent Job Queues: All jobs are stored in Redis, ensuring they persist through application or server restarts.
+1. Node.js
+This project is built on Node.js. Please install a current LTS version (v18+).
 
-#⚙️ Parallel Worker Pooling: Execute multiple jobs concurrently by running a pool of worker processes.
-
-#🔁 Automatic Job Retries: Jobs that fail are automatically retried using an exponential backoff strategy.
-
-#🪦 Dead Letter Queue (DLQ): Jobs that exhaust all retry attempts are moved to a separate "dead" queue for manual review.
-
-#🖥️ Complete CLI Management: Enqueue jobs, start/stop workers, check queue status, and manage the DLQ, all from your terminal.
-
-#📋 System Requirements
-Before you begin, your system must have the following dependencies installed.
-
-1. Node.js (v18+)
-This project requires a current LTS version of Node.js.
-
-#Download Node.js
+Download Node.js
 
 2. Redis Server
-Redis is the mandatory backend database and message broker. The redis-server command must be in your path.
+BullMQ uses Redis as its database and message broker to store all job data. This is not optional.
 
-#Installation:
+You must have the redis-server command available on your system.
 
 On Fedora: sudo dnf install redis
-
 On Ubuntu/Debian: sudo apt install redis-server
-
-On macOS (Homebrew): brew install redis
-
-#3. PM2 (Process Manager)
-PM2 is used to manage the background worker processes.
+On macOS (using Homebrew): brew install redis
+3. PM2 (Process Manager)
+The CLI uses PM2 to manage the background worker processes. This allows queuectl to start, stop, and monitor workers that run in the background.
 
 Install it globally:
 
-Bash
-
 npm install pm2 -g
-🛠️ Installation and Configuration
-Clone the repository and install dependencies:
-
-Bash
-
+🚀 Installation & Setup
+Clone the repository:
 git clone https://github.com/your-username/queuectl.git
 cd queuectl
+Install NPM dependencies:
 npm install
-Link the CLI: This makes the queuectl command globally accessible.
-
-Bash
+Link the CLI:
+This step uses the bin field in package.json to create a global queuectl command, so you can run it from any directory.
 
 npm link
-Create the .env File: Create a .env file in the project's root for Redis connection details.
-
-Bash
+Create your Environment File:
+The CLI connects to Redis using environment variables. Create a .env file in the root of the project.
 
 touch .env
-Add the following content to the new .env file:
-
-Ini, TOML
+Now, add the following content to the .env file. (These defaults match the redis.conf file already in the project).
 
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-Configure Redis Persistence: a. Create a file named redis.conf in the project's root (queuectl) folder. b. Paste the following configuration into it:
+Create the Redis Configuration File:
+For persistence, queuectl is designed to run Redis with a specific configuration file. This tells Redis where to save its data.
 
-#Code snippet
+a. In the root of your project (the queuectl folder), create a file named redis.conf.
+
+b. Copy and paste the following content into it:
 
 # --- Persistence ---
 # Save the DB to a file named...
@@ -83,94 +67,98 @@ dir /home/jynt/Coding/FLAM/redis-data
 # --- General ---
 port 6379
 logfile "redis.log"
-⚠️ Important: You must change the dir path to an absolute path on your machine.
+c. Critical Step: You must change the dir path to match the absolute path to the redis-data folder on your own machine.
 
-Find the correct path by navigating to the redis-data folder and running pwd.
+Find your path by running pwd inside the redis-data folder.
+Update the line: dir /your/absolute/path/to/queuectl/redis-data
+🏃 How to Run
+The system requires two separate, long-running processes. You will need 3 terminals open.
 
-Update the line to: dir /your/absolute/path/to/queuectl/redis-data
+Terminal 1: Start the Redis Server
+You must start Redis from the project folder so it uses the included redis.conf file. This makes your data persistent.
 
-🏃 Running the System
-This system needs two distinct processes running. You will need three terminal sessions.
-
-Terminal 1: Launch Redis
-Start Redis from the project directory to load the correct persistence configuration.
-
-Bash
-
-# Navigate to the queuectl project folder
+# Make sure you are in the queuectl project folder
 cd /path/to/queuectl
 
-# Start Redis with the local configuration
+# Start Redis using the local config
 redis-server ./redis.conf
-Terminal 2: Launch the Workers
-In a second terminal, start your worker pool.
-
-Bash
+Terminal 2: Start the Workers
+In a new terminal (also in the project folder), start your worker pool.
 
 cd /path/to/queuectl
 
-# Start 3 background worker processes
+# Start 3 worker processes in the background
 queuectl worker start --count 3
 Terminal 3: Use the CLI
-You can now manage your queue from any terminal.
-
-Bash
+Now you can enqueue and manage jobs from any terminal.
 
 # Enqueue a new job
 queuectl enqueue '{"id":"job1", "command":"echo Hello World"}'
 
 # Check the queue status
 queuectl status
-📖 CLI Command Guide
-Here is a complete list of all available queuectl commands.
+📋 Command Reference
+Here are all the commands supported by queuectl.
 
 Manage Workers
-queuectl worker start --count <n> Launches <n> background worker processes via PM2.
+queuectl worker start --count <n>
 
-Bash
+Starts <n> worker processes in the background using PM2. If workers are already running, this will restart them with the new count.
 
 queuectl worker start --count 4
-queuectl worker stop Performs a graceful shutdown and removes all running workers from PM2.
+queuectl worker stop
 
-Bash
+Gracefully stops and removes all running workers from PM2.
 
 queuectl worker stop
-queuectl logs Tails the live logs from all active workers directly to your terminal (Ctrl+C to exit).
+queuectl logs
+
+Streams the live logs from all running workers directly to your terminal. (Press Ctrl+C to exit).
 
 Manage Jobs
-queuectl enqueue <jobJson> Enqueues a new job. The JSON payload must include a command.
+queuectl enqueue <jobJson>
 
-Bash
+Adds a new job to the queue. The JSON string must contain a command. You can optionally pass id and max_retries. If max_retries is not provided, the value from queuectl config is used.
 
-# A simple job
+# Simple job
 queuectl enqueue '{"id":"job-echo", "command":"echo Hello"}'
 
-# A job with a specific retry limit
+# Job with a custom retry limit
 queuectl enqueue '{"id":"job-fail", "command":"ls /badpath", "max_retries": 2}'
-queuectl status Displays a high-level overview of all job states (Pending, Processing, Completed, etc.).
+queuectl status
 
-queuectl list --state <state> Retrieves a list of all jobs in a given state.
+Shows a high-level summary of all job states (Pending, Processing, Completed, Failed, etc.).
 
-States: pending, processing, completed, dead, retry
+queuectl list --state <state>
 
-Bash
+Lists all jobs in a specific state.
+
+States: pending, processing (active), completed, dead (failed), retry (delayed)
 
 queuectl list --state completed
 queuectl list --state dead
-queuectl job status <jobId> Fetches detailed information and history for a specific job.
+queuectl job status <jobId>
 
-Bash
+Checks the current state and detailed info for a single job, including timestamps and results.
 
 queuectl job status job-echo
 Manage the Dead Letter Queue (DLQ)
-queuectl dlq list Shows all jobs that have permanently failed and are in the DLQ.
+The "DLQ" is the queue for dead (or failed) jobs.
 
-queuectl dlq retry <jobId> Resubmits a specific job from the DLQ back into the pending queue.
+queuectl dlq list
+
+Lists all jobs that have permanently failed (exhausted all retries).
+
+queuectl dlq retry <jobId>
+
+Moves a specific job from the DLQ back into the pending queue to be retried by a worker.
 
 Manage Configuration
-queuectl config set <key> <value> Saves a setting to the .queuectl.config.json file.
+queuectl config set <key> <value>
 
-Bash
+Saves a setting to the .queuectl.config.json file. This is currently used to set the default maxRetries for new jobs.
 
 queuectl config set max-retries 5
-queuectl config list Displays all current settings from the .queuectl.config.json file.
+queuectl config list
+
+Shows all current settings from the .queuectl.config.json file.
