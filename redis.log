@@ -1,0 +1,16 @@
+1509:C 10 Nov 2025 14:29:48.830 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1509:C 10 Nov 2025 14:29:48.853 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1509:C 10 Nov 2025 14:29:48.868 * Redis version=8.2.3, bits=64, commit=00000000, modified=1, pid=1509, just started
+1509:C 10 Nov 2025 14:29:48.883 * Configuration loaded
+1509:M 10 Nov 2025 14:29:48.897 * monotonic clock: POSIX clock_gettime
+1509:M 10 Nov 2025 14:29:48.910 * Running mode=standalone, port=6379.
+1509:M 10 Nov 2025 14:29:48.925 # Warning: Could not create server TCP listening socket *:6379: bind: Address already in use
+1509:M 10 Nov 2025 14:29:48.939 # Failed listening on port 6379 (tcp), aborting.
+1559:C 10 Nov 2025 14:31:24.029 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+1559:C 10 Nov 2025 14:31:24.056 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1559:C 10 Nov 2025 14:31:24.075 * Redis version=8.2.3, bits=64, commit=00000000, modified=1, pid=1559, just started
+1559:C 10 Nov 2025 14:31:24.094 * Configuration loaded
+1559:M 10 Nov 2025 14:31:24.111 * monotonic clock: POSIX clock_gettime
+1559:M 10 Nov 2025 14:31:24.128 * Running mode=standalone, port=6379.
+1559:M 10 Nov 2025 14:31:24.143 # Warning: Could not create server TCP listening socket *:6379: bind: Address already in use
+1559:M 10 Nov 2025 14:31:24.159 # Failed listening on port 6379 (tcp), aborting.
