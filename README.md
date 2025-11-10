@@ -1,4 +1,4 @@
-# queuectl: A CLI Job Queue System
+# Queue_CTL_CLI: A CLI Job Queue System
 
 queuectl is a command-line interface for managing a persistent, background job queue. It's built on Node.js and powered by BullMQ and Redis.
 
